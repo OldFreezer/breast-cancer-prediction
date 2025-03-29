@@ -11,7 +11,7 @@ import tuner
 
 import argparse
 
-import logic_regress
+import models
 
 # I used this to find correlation between the variables
 # Just shows a bar chart comparing the diagnosis to the variable value
@@ -80,19 +80,27 @@ if __name__ == "__main__":
         clean_uncorrelated(basic.readconfig('main')['important_variables'])
     elif args.command == "tuneLR":
         tuner.tune(
-            logic_regress.test_model,
+            models.logic_regress,
             load_dataset(clean=True),
             basic.readconfig('main')['important_variables'],
             params={
                 "test_size": 0.25, # Messing with the test size can skew results
-                "solver": {"type": str, "vals": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"]},
-                "exclude_variables": {"type": list, "len": 3, "vals": basic.readconfig('main')['important_variables']}
+                "solver": "liblinear",
+                "exclude_variables": {"type": list, "len": 3, "vals": basic.readconfig('main')['important_variables']},
+                "C": {"type": float, "min": 0.1, "max": 1.1, "interval": 0.1}
             }
         )
     elif args.command == "testLR":
-        # Test logic regress
-        cnf_matrix, score = logic_regress.test_model(load_dataset(clean=True))
+        # Test best logic regress model
+        cnf_matrix, score, f1 = models.logic_regress(
+            load_dataset(clean=True),
+            exclude_variables=["texture_mean","area_se","texture_worst"],
+            C=0.6,
+            test_size=0.25,
+            solver="liblinear"
+            )
         print('Accuracy Score: %s' % (score))
+        print('F1: %s' % (f1))
         visualize_confusion(cnf_matrix)
     else:
         # TODO: Print help
