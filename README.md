@@ -26,7 +26,7 @@ If I had enough time, I could have used my "Model Tuner" (See Below) to filter t
 ![Log Regress 1 Image](/images/correlations/area_mean.png)
 ![Log Regress 1 Image](/images/correlations/perimeter_mean.png)
 
-All of my correlated variables bar graphs are in ./correlations/
+All of my correlated variables bar graphs are in ./images/correlations/
 
 A list was placed in `main.config` that contains all of the important variables that I will use in model training:
 ```
@@ -110,7 +110,7 @@ I did not have time to actually analyze the decision tree plot, but I thought it
 
 ### Tuning:
 
-In order to maintain consistency with the previous model's training data, I decided to keep the same `exclude_variables`. So the only 2 variables that I wanted to tune were `criterion`, `max_depth`, and `min_samples_split`
+In order to maintain consistency with the previous model's training data, I decided to keep the same `exclude_variables`. So the only variables that I wanted to tune were `criterion`, `max_depth`, and `min_samples_split`
 
 Tuner Options:
 ```
