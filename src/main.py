@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy
 import json
+import sys
 import os
 import tuner
 
@@ -73,11 +74,46 @@ if __name__ == "__main__":
                     prog='Breast Cancer Prediction',
                     description='CHS Club Hackathon')
     parser.add_argument('command')
+    parser.add_argument('--model')
     args = parser.parse_args()
     if args.command == "explore":
         explore_data(load_dataset())
     elif args.command == "cleanCharts": 
         clean_uncorrelated(basic.readconfig('main')['important_variables'])
+    elif args.command == "testModels":
+        # This runs the "final model test" on all models with their tuned params
+        finalScore = models.testModel(
+            models.logic_regress,
+            {
+                "exclude_variables": [
+                    "perimeter_worst",
+                    "radius_mean",
+                    "area_mean"
+                ],
+                "C": 0.9,
+                "test_size": 0.25,
+                "solver": "liblinear",
+                "random_state": None
+            },
+            load_dataset(clean=True)
+        )
+        print("Final score for the log_regress model: %s" % (finalScore))
+        finalScore = models.testModel(
+            models.decision_tree,
+            {
+                "exclude_variables": [
+                    "perimeter_worst",
+                    "radius_mean",
+                    "area_mean"
+                ],
+                "criterion": "log_loss",
+                "max_depth": 4,
+                "min_samples_split": 4,
+                "test_size": 0.25
+            },
+            load_dataset(clean=True)
+        )
+        print("Final score for the decision_tree model: %s" % (finalScore))
     elif args.command == "tuneLR":
         tuner.tune(
             models.logic_regress,
@@ -91,11 +127,15 @@ if __name__ == "__main__":
             }
         )
     elif args.command == "testLR":
-        # Test best logic regress model
+        # Test best logic regress model (Using fixed random_state)
         cnf_matrix, score = models.logic_regress(
             load_dataset(clean=True),
-            exclude_variables=["texture_mean","area_se","texture_worst"],
-            C=0.6,
+            exclude_variables=[
+                    "perimeter_worst",
+                    "radius_mean",
+                    "area_mean"
+                ],
+            C=0.9,
             test_size=0.25,
             random_state=None,
             solver="liblinear"
@@ -109,14 +149,14 @@ if __name__ == "__main__":
             basic.readconfig('main')['important_variables'],
             params={
                 "test_size": 0.25,
-                "exclude_variables": ["texture_mean", "area_se", "texture_worst"],
+                "exclude_variables": ['perimeter_worst', 'radius_mean', 'area_mean'],
                 "criterion": {"type": str, "vals": ["gini", "entropy", "log_loss"]},
                 "max_depth": {"type": int, "min": 1, "max": 5, "interval": 1},
                 "min_samples_split": {"type": int, "min": 2, "max": 10, "interval": 1}
             }
         )
     elif args.command == "testDT":
-        # Test Decision Tree model
+        # Test Decision Tree model (Using fixed random_state)
         cnf_matrix, score = models.decision_tree(
             load_dataset(clean=True),
             showPlot=True,

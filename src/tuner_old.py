@@ -1,5 +1,7 @@
 #!/bin/python3
 
+# This is the old version of my "Model Tuner", more about it is explained in the "Discovery of oversight" section in README.md
+
 # This can be universally used to mass-test hyperparameters to optimize models via the `tune` function
 # The time this can take will increase by O(2^n) (I think). Where n is the number of arguments tested
 # Re-writing this in rust or something would make it much faster
@@ -21,10 +23,10 @@
 # If a param `type`
 # This function will return the paramaters that give the maximum accuracy score
 
+# TODO: MultiProcessing
+
 from itertools import product, combinations
 import decimal
-import models
-import basic
 import math
 import multiprocessing
 
@@ -42,8 +44,7 @@ def runTests(model_function, dataset, fixedParams, allTuneParams, pqueue):
     best_params = {}
     for tuneParams in allTuneParams:
         tuneParams.update(fixedParams) # Add the fixed params
-        config = basic.readconfig('main')
-        score = models.testModel(model_function, tuneParams, dataset, trials=config['tuner_params_iterations'])
+        cnf_matrix, score = model_function(dataset, **tuneParams)
         if score > best_params_score:
             best_params = tuneParams
             best_params_score = score
@@ -90,9 +91,7 @@ def tune(model_function, dataset, important_variables, params):
             i += 1
         allTuneParams.append(newParams)
 
-    config = basic.readconfig('main')
-
-    print("Model Tests To Run: %s*%s = %s" % (len(allTuneParams),config['tuner_params_iterations'],len(allTuneParams)*config['tuner_params_iterations']))
+    print("Model Tests To Run: %s" % (len(allTuneParams)))
     cores = multiprocessing.cpu_count()
     # Distribute the work over all CPU cores
     print("CPU Cores Detected: %s" % (cores))

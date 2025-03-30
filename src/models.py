@@ -9,6 +9,16 @@ from sklearn.linear_model import LogisticRegression
 
 from sklearn import metrics, tree
 
+# Test a model multiple times over and average out it's accuracy score
+# I could multiprocess this, but it's not necessary for a low number of trials
+def testModel(modelFunction, params, dataset, trials=30):
+    scores = []
+    params['random_state'] = None
+    for i in range(0,trials):
+        cnf_matrix, score = modelFunction(dataset, **params)
+        scores.append(score)
+    return sum(scores)/len(scores)
+
 # Logistic Regression Model
 def logic_regress(dataset, exclude_variables=[], random_state=16, test_size=0.25, max_iter=5000, C=1, solver='liblinear'):
     config = basic.readconfig('main')

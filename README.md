@@ -2,10 +2,11 @@
 
 The goal of this project is to use machine learning models in order to predict malignant tumors in the dataset. I have never worked with SciKit or machine learning models in the past so this was a great learning experience for me.
 
+Everything in this markdown file is put in chronological order. This is especially prevalent when I change my model tuner function due to an oversight, which while it forced me to re-run my tests, I still kept the findings from before I changed the tuner.
+
 ## Credits
 
 I mostly used the scikit documentation for this project <https://scikit-learn.org/> and some help from StackOverflow and GeeksForGeeks. Generative AI was not used at all during this challenge.
-
 
 ## Exploratory Data Analysis and Data Processing
 
@@ -136,3 +137,70 @@ Tuner Options:
   ]
 }
 ```
+
+
+![DT 2 Image](/images/confusion/tree_2.png)
+
+![DT 2 Image](/images/other/decision_tree_2.png)
+
+
+## Testing Both Models:
+
+Now I had 2 models that were very crudely tuned and I wasn't comfortable with deciding on one without doing some more testing first. This was mostly due to the fact that the `random_state` variable was fixed, so I decided to run multiple tests of each "tuned" model side by side and average out their accuracy scores.
+
+So I implemented the `testModel` function, which would run a model multiple times (With varying `random_state`) and average the final accuracy scores.
+
+
+### Discovery of oversight and moving forward
+
+While I was testing the models using `testModel` I discovered that the "tuned" models turned out to score a lot lower when tested multiple times over:
+```
+Final score for the log_regress model: 0.9441520467836256
+Final score for the decision_tree model: 0.9169590643274854
+```
+This is something that I should have accounted for in my model tuner, I should instead have it use the `testModel` function when tuning models in order to get a more accurate. 
+
+I have put the old model tuner code in `tuner_old.py` and I will now be using the improved tuner code.
+
+
+At this point I am basically splitting hairs with the optimization due to the small dataset. So I will keep the results for each improved test simple and just decide on a final model.
+
+## Improved Logistic Regression Model
+```
+Final best params: Score: 0.9701754385964912 Params: {'exclude_variables': ('perimeter_worst', 'radius_mean', 'area_mean'), 'C': 0.9, 'test_size': 0.25, 'solver': 'liblinear', 'random_state': None}
+```
+
+## Improved Decision Tree Model
+```
+Final best params: Score: 0.9526315789473685 Params: {'criterion': 'log_loss', 'max_depth': 4, 'min_samples_split': 4, 'test_size': 0.25, 'exclude_variables': ['perimeter_worst', 'radius_mean', 'area_mean'], 'random_state': None}
+```
+
+## Better results with different exclude_variables
+When I re-ran the logistic regression tuning (With tuning `exclude_variables`) I found a set of `exclude_variables` that seemed to improve even the decision tree model:
+```
+['perimeter_worst', 'radius_mean', 'area_mean']
+```
+
+# Final Results
+
+I would have liked to test out more models, but I will have to cut it short due to time. However, both conceptually and experimentally speaking, it seems like the Logistic Regression Model is the best fit for this use case. 
+
+Here are the best parameters and confusion matrix for the Tuned Logistic Regression Model:
+```
+{
+  "exclude_variables": [
+    "perimeter_worst",
+    "radius_mean",
+    "area_mean"
+  ],
+  "C": 0.9,
+  "test_size": 0.25,
+  "solver": "liblinear",
+  "random_state": None
+}
+```
+
+![Final Confusion](/images/confusion/final.png)
+
+
+Overall I think that my results mostly had drawbacks due to a small dataset and not running enough iterations of tests. 
