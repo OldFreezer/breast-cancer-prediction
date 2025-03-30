@@ -76,7 +76,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.command == "explore":
         explore_data(load_dataset())
-    elif args.command == "clean": 
+    elif args.command == "cleanCharts": 
         clean_uncorrelated(basic.readconfig('main')['important_variables'])
     elif args.command == "tuneLR":
         tuner.tune(
@@ -92,15 +92,45 @@ if __name__ == "__main__":
         )
     elif args.command == "testLR":
         # Test best logic regress model
-        cnf_matrix, score, f1 = models.logic_regress(
+        cnf_matrix, score = models.logic_regress(
             load_dataset(clean=True),
             exclude_variables=["texture_mean","area_se","texture_worst"],
             C=0.6,
             test_size=0.25,
+            random_state=None,
             solver="liblinear"
             )
         print('Accuracy Score: %s' % (score))
-        print('F1: %s' % (f1))
+        visualize_confusion(cnf_matrix)
+    elif args.command == "tuneDT":
+        tuner.tune(
+            models.decision_tree,
+            load_dataset(clean=True),
+            basic.readconfig('main')['important_variables'],
+            params={
+                "test_size": 0.25,
+                "exclude_variables": ["texture_mean", "area_se", "texture_worst"],
+                "criterion": {"type": str, "vals": ["gini", "entropy", "log_loss"]},
+                "max_depth": {"type": int, "min": 1, "max": 5, "interval": 1},
+                "min_samples_split": {"type": int, "min": 2, "max": 10, "interval": 1}
+            }
+        )
+    elif args.command == "testDT":
+        # Test Decision Tree model
+        cnf_matrix, score = models.decision_tree(
+            load_dataset(clean=True),
+            showPlot=True,
+            criterion="gini",
+            max_depth=4,
+            min_samples_split=4,
+            test_size=0.25,
+            exclude_variables=[
+                "texture_mean",
+                "area_se",
+                "texture_worst"
+            ]
+            )
+        print('Accuracy Score: %s' % (score))
         visualize_confusion(cnf_matrix)
     else:
         # TODO: Print help

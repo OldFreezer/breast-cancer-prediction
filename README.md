@@ -1,5 +1,11 @@
 # Breast Cancer Prediction
 
+The goal of this project is to use machine learning models in order to predict malignant tumors in the dataset. I have never worked with SciKit or machine learning models in the past so this was a great learning experience for me.
+
+## Credits
+
+I mostly used the scikit documentation for this project <https://scikit-learn.org/> and some help from StackOverflow and GeeksForGeeks. Generative AI was not used at all during this challenge.
+
 
 ## Exploratory Data Analysis and Data Processing
 
@@ -9,12 +15,13 @@ It sets up a bar graph for me to easily see if there are any outstanding differe
 
 I could have probably used some statistics or something to do this part but due to time I just did manually. This part was very subjective so I could have definitley made some mistakes here, but overall I think I was able to catch a lot of very strong correlations.
 
+If I had enough time, I could have used my "Model Tuner" (See Below) to filter through which variables would work best with any given model. 
 
 ### Some (Not All) Correlated Variables that I found:
 
-![Log Regress 1 Image](/correlations/radius_worst.png)
-![Log Regress 1 Image](/correlations/area_mean.png)
-![Log Regress 1 Image](/correlations/perimeter_mean.png)
+![Log Regress 1 Image](/images/correlations/radius_worst.png)
+![Log Regress 1 Image](/images/correlations/area_mean.png)
+![Log Regress 1 Image](/images/correlations/perimeter_mean.png)
 
 All of my correlated variables bar graphs are in ./correlations/
 
@@ -35,8 +42,14 @@ This "model tuner" also can help me see if excluding certain variables can incre
 
 It is very simple and can be scaled up tremendously, but due to time constraints I'm not going to be able to play around with testing all the parameters on all the models. 
 
+#### Current Drawbacks
+
+With all of my tests, I set the `random_state` seed to 16 by default, in order to make results deterministic. However it is possible that just by random chance a certain set of parameters scored a lot higher than the others. This could easily be fixed by setting the `random_state` to "None" and then running each set of possible parameters multiple times, then take the average of the score. Due to time constraints, I'm not able to do this so the "Model Tuner" stands as a proof-of-concept.
+
+Due to a very small dataset there is the strong possibility of overfitting any of these models.
+
 #### Side Note:
-Any time that I talk about the `exclude_variables` model parameter, this is referring to which variables will be excluded from model training. 
+Any time that I talk about the `exclude_variables` model parameter, this is referring to which variables (such as `radius_worst` or `texture_mean`) will be excluded from model training. 
 
 ## The logistic regression model
 
@@ -44,7 +57,7 @@ Any time that I talk about the `exclude_variables` model parameter, this is refe
 
 #### Accuracy Score: 0.956140350877193
 
-![Log Regress 1 Image](/confusion/log_regress_1.png)
+![Log Regress 1 Image](/images/confusion/log_regress_1.png)
 
 ### Tuning:
 
@@ -63,6 +76,9 @@ Tuner Options:
 ```
 
 #### Accuracy Score: 0.9824561403508771 
+
+![Log Regress 2 Image](/images/confusion/log_regress_2.png)
+
 #### Parameters:
 ```
 {
@@ -77,3 +93,46 @@ Tuner Options:
 }
 ```
 
+## The Decision Tree Model
+
+### First results with default options:
+
+#### Accuracy Score: 0.9122807017543859
+
+![DT 1 Image](/images/confusion/tree_1.png)
+
+![DT 1 Image](/images/other/decision_tree_1.png)
+
+I did not have time to actually analyze the decision tree plot, but I thought it would be useful to include.
+
+### Tuning:
+
+In order to maintain consistency with the previous model's training data, I decided to keep the same `exclude_variables`. So the only 2 variables that I wanted to tune were `criterion`, `max_depth`, and `min_samples_split`
+
+Tuner Options:
+```
+{
+    "test_size": 0.25, 
+    "exclude_variables": ["texture_mean", "area_se", "texture_worst"],
+    "criterion": {"type": str, "vals": ["gini", "entropy", "log_loss"]},
+    "max_depth": {"type": int, "min": 1, "max": 5, "interval": 1},
+    "min_samples_split": {"type": int, "min": 2, "max": 10, "interval": 1}
+}
+```
+
+#### Accuracy Score: 0.956140350877193
+
+#### Parameters:
+```
+{
+  "criterion": "gini",
+  "max_depth": 4,
+  "min_samples_split": 4,
+  "test_size": 0.25,
+  "exclude_variables": [
+    "texture_mean",
+    "area_se",
+    "texture_worst"
+  ]
+}
+```

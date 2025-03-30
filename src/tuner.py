@@ -14,9 +14,11 @@
 # {
 #   "random_state": 16, # The random_state is fixed for every test
 #   "test_size": {"type": float, "min": 0.05, "max": 0.95, "interval": 0.5},
-#   "solver": {"type": str, "vals": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"]}
+#   "solver": {"type": str, "vals": ["lbfgs", "liblinear", "newton-cg", "newton-cholesky", "sag", "saga"]},
+#   "exclude_variables": {"type": list, "len": 1, "vals": ["area_mean", "area_se", "area_worst"]}
 # }
-
+#  
+# If a param `type`
 # This function will return the paramaters that give the maximum accuracy score
 
 # TODO: MultiProcessing
@@ -63,8 +65,10 @@ def tune(model_function, dataset, important_variables, params):
     
     for tuneParam in tune_params:
         # See what type of parameter it is, and get all the possible values
-        if tune_params[tuneParam]['type'] == float or tune_params[tuneParam]['type'] == int:
+        if tune_params[tuneParam]['type'] == float:
             tuneParams.append(list(drange(tune_params[tuneParam]['min'],tune_params[tuneParam]['max'],tune_params[tuneParam]['interval'])))
+        elif tune_params[tuneParam]['type'] == int:
+            tuneParams.append(list(range(tune_params[tuneParam]['min'],tune_params[tuneParam]['max'],tune_params[tuneParam]['interval'])))
         elif tune_params[tuneParam]['type'] == str:
             tuneParams.append(tune_params[tuneParam]['vals'])
         elif tune_params[tuneParam]['type'] == list:

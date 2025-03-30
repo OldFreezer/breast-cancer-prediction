@@ -38,13 +38,10 @@ def logic_regress(dataset, exclude_variables=[], random_state=16, test_size=0.25
     # Get the accuracy score
     score = metrics.accuracy_score(y_test,y_pred)
 
-    # Get the f1 score
-    f1 = metrics.recall_score(y_test,y_pred)
-
-    return cnf_matrix, score, f1
+    return cnf_matrix, score
 
 # Decision Tree Model
-def decision_tree(dataset, exclude_variables=[], random_state=16, test_size=0.25):
+def decision_tree(dataset, exclude_variables=[], random_state=16, test_size=0.25, showPlot=False, criterion="gini", max_depth=None, min_samples_split=2):
     config = basic.readconfig('main')
     vars = config['important_variables']
     for exclude in exclude_variables:
@@ -57,6 +54,19 @@ def decision_tree(dataset, exclude_variables=[], random_state=16, test_size=0.25
     # From what I understand, random_state is essentially a seed for reproducability
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=test_size, random_state=random_state) # Uses a 3:1 ratio training:testing
 
-    clf = tree.DecisionTreeClassifier()
+    clf = tree.DecisionTreeClassifier(criterion=criterion,max_depth=max_depth,min_samples_split=min_samples_split)
 
     clf = clf.fit(X_train, y_train)
+
+    y_pred = clf.predict(X_test)
+
+    # Create a confusion matrix, which basically evaluates the performance of the model
+    cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+
+    # Get the accuracy score
+    score = metrics.accuracy_score(y_test,y_pred)
+
+    if showPlot:
+        tree.plot_tree(clf)
+
+    return cnf_matrix, score
