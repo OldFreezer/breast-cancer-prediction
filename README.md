@@ -51,6 +51,8 @@ With all of my tests, I set the `random_state` seed to 16 by default, in order t
 
 Due to a very small dataset there is the strong possibility of overfitting any of these models.
 
+**EDIT:** After testing, I realized that this is a major flaw and I have improved the "Model Tuner" at the end of this README
+
 #### Side Note:
 Any time that I talk about the `exclude_variables` model parameter, this is referring to which variables (such as `radius_worst` or `texture_mean`) will be excluded from model training. 
 
@@ -160,7 +162,7 @@ While I was testing the models using `testModel` I discovered that the "tuned" m
 Final score for the log_regress model: 0.9441520467836256
 Final score for the decision_tree model: 0.9169590643274854
 ```
-This is something that I should have accounted for in my model tuner, I should instead have it use the `testModel` function when tuning models in order to get a more accurate. 
+This is something that I should have accounted for in my model tuner, I should instead have it use the `testModel` function when tuning models in order to get a more accurate score. 
 
 I have put the old model tuner code in `tuner_old.py` and I will now be using the improved tuner code.
 
@@ -185,9 +187,9 @@ When I re-ran the logistic regression tuning (With tuning `exclude_variables`) I
 
 # Final Results
 
-I would have liked to test out more models, but I will have to cut it short due to time. However, both conceptually and experimentally speaking, it seems like the Logistic Regression Model is the best fit for this use case. 
+I would have liked to test out more models, but I will have to cut it short due to time. However, both conceptually and experimentally speaking, it seems like the **Logistic Regression Model** is the best fit for this use case. 
 
-Here are the best parameters and confusion matrix for the Tuned Logistic Regression Model:
+Here are the best parameters and confusion matrix for the **Tuned Logistic Regression Model**:
 
 #### Final Accuracy Score: 0.9701754385964912
 
