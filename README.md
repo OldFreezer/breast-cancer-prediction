@@ -6,7 +6,9 @@ Everything in this markdown file is put in chronological order. This is especial
 
 ## Credits
 
-I mostly used the scikit documentation for this project <https://scikit-learn.org/> and some help from StackOverflow and GeeksForGeeks. Generative AI was not used at all during this challenge.
+I mostly used the scikit documentation for this project <https://scikit-learn.org/> and some help from StackOverflow and GeeksForGeeks. 
+
+Generative AI was not used at all during this challenge.
 
 ## Exploratory Data Analysis and Data Processing
 
@@ -14,7 +16,7 @@ In this step I used the explore_data function in main.py to quickly go through a
 
 It sets up a bar graph for me to easily see if there are any outstanding differences between the malignant and benign diagnoses.
 
-I could have probably used some statistics or something to do this part but due to time I just did manually. This part was very subjective so I could have definitley made some mistakes here, but overall I think I was able to catch a lot of very strong correlations.
+I could have probably used some statistics or something to do this part but due to time I just did it manually. This part was very subjective so I could have definitely made some mistakes here, but overall I think I was able to catch a lot of very strong correlations.
 
 If I had enough time, I could have used my "Model Tuner" (See Below) to filter through which variables would work best with any given model. 
 
@@ -186,6 +188,9 @@ When I re-ran the logistic regression tuning (With tuning `exclude_variables`) I
 I would have liked to test out more models, but I will have to cut it short due to time. However, both conceptually and experimentally speaking, it seems like the Logistic Regression Model is the best fit for this use case. 
 
 Here are the best parameters and confusion matrix for the Tuned Logistic Regression Model:
+
+#### Final Accuracy Score: 0.9701754385964912
+
 ```
 {
   "exclude_variables": [
